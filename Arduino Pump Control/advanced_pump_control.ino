@@ -47,6 +47,7 @@ float pumpRPM = 0;
 // Auto-cycle mode
 unsigned long lastCycleUpdate = 0;
 int cycleDirection = 1;  // 1 for up, -1 for down
+const int CYCLE_SPEED_INCREMENT = 2;  // Speed change per cycle update
 
 // Emergency stop
 volatile bool emergencyStop = false;
@@ -189,7 +190,7 @@ void updatePotentiometerSpeed() {
 
 void updateAutoCycleSpeed() {
   if (millis() - lastCycleUpdate >= 50) {
-    targetSpeed += cycleDirection * 2;
+    targetSpeed += cycleDirection * CYCLE_SPEED_INCREMENT;
     
     if (targetSpeed >= 255) {
       targetSpeed = 255;

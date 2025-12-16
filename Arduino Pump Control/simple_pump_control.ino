@@ -16,6 +16,7 @@
  */
 
 const int PWM_PIN = 9;  // PWM output pin for pump control
+const int PERCENTAGE_STEP = 26;  // Approximately 10% increments (255/10)
 
 void setup() {
   // Initialize serial for debugging
@@ -39,7 +40,7 @@ void loop() {
     analogWrite(PWM_PIN, speed);
     
     // Print status every 10% increment
-    if (speed % 26 == 0) {
+    if (speed % PERCENTAGE_STEP == 0) {
       int percentage = (speed * 100) / 255;
       Serial.print("Speed: ");
       Serial.print(percentage);
@@ -59,7 +60,7 @@ void loop() {
     analogWrite(PWM_PIN, speed);
     
     // Print status every 10% decrement
-    if (speed % 26 == 0) {
+    if (speed % PERCENTAGE_STEP == 0) {
       int percentage = (speed * 100) / 255;
       Serial.print("Speed: ");
       Serial.print(percentage);
