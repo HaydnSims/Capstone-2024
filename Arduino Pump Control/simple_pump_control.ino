@@ -11,12 +11,17 @@
  * 
  * WARNING: Never connect 24V directly to Arduino pins!
  * 
- * This sketch gradually increases pump speed from 0% to 100% over 10 seconds,
- * then decreases back to 0% and repeats.
+ * This sketch runs the pump at a specified PWM value for 5 seconds,
+ * then stops. Change the PUMP_PWM variable to adjust speed.
  */
 
 const int PWM_PIN = 9;  // PWM output pin for pump control
-const int PERCENTAGE_STEP = 26;  // Approximately 10% increments (255/10)
+
+// === CHANGE THIS VALUE TO CONTROL PUMP SPEED ===
+// PWM value: 0 (off) to 255 (full speed)
+// Recommended starting value: 64 (25% speed)
+const int PUMP_PWM = 64;  
+// ===============================================
 
 void setup() {
   // Initialize serial for debugging
@@ -30,47 +35,28 @@ void setup() {
   analogWrite(PWM_PIN, 0);
   
   delay(2000);  // Wait 2 seconds before starting
-  Serial.println("Starting pump ramp-up...");
+  
+  // Calculate and display percentage
+  int percentage = (PUMP_PWM * 100) / 255;
+  Serial.print("Setting pump to ");
+  Serial.print(percentage);
+  Serial.print("% (PWM: ");
+  Serial.print(PUMP_PWM);
+  Serial.println(")");
 }
 
 void loop() {
-  // Ramp up from 0% to 100% over 10 seconds
-  Serial.println("Ramping UP...");
-  for (int speed = 0; speed <= 255; speed++) {
-    analogWrite(PWM_PIN, speed);
-    
-    // Print status every 10% increment
-    if (speed % PERCENTAGE_STEP == 0) {
-      int percentage = (speed * 100) / 255;
-      Serial.print("Speed: ");
-      Serial.print(percentage);
-      Serial.println("%");
-    }
-    
-    delay(40);  // Delay for smooth ramp (total ~10 seconds for full ramp)
-  }
+  // Turn pump on at specified PWM value
+  analogWrite(PWM_PIN, PUMP_PWM);
+  Serial.println("Pump ON");
   
-  // Hold at maximum speed for 3 seconds
-  Serial.println("At maximum speed (100%)");
-  delay(3000);
+  // Run for 5 seconds
+  delay(5000);
   
-  // Ramp down from 100% to 0% over 10 seconds
-  Serial.println("Ramping DOWN...");
-  for (int speed = 255; speed >= 0; speed--) {
-    analogWrite(PWM_PIN, speed);
-    
-    // Print status every 10% decrement
-    if (speed % PERCENTAGE_STEP == 0) {
-      int percentage = (speed * 100) / 255;
-      Serial.print("Speed: ");
-      Serial.print(percentage);
-      Serial.println("%");
-    }
-    
-    delay(40);  // Delay for smooth ramp
-  }
+  // Turn pump off
+  analogWrite(PWM_PIN, 0);
+  Serial.println("Pump OFF");
   
-  // Hold at zero speed for 3 seconds
-  Serial.println("Pump stopped (0%)");
-  delay(3000);
+  // Wait 5 seconds before repeating
+  delay(5000);
 }
